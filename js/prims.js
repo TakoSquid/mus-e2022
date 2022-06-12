@@ -9,9 +9,6 @@ function creerScene(){
 
 
 function creerCamera(name,options,scn){
-	// console.log("creation camera");
-	// Création de la caméra
-	// =====================
 
 	camera = new BABYLON.UniversalCamera(name,new BABYLON.Vector3(0,1.5,5),scn) ;
 	camera.setTarget(new BABYLON.Vector3(0, 1, 0)) ; 
@@ -29,18 +26,6 @@ function creerCamera(name,options,scn){
 	camera.ellipsoid = new BABYLON.Vector3(1,0.7,1) ; 
 
 	camera.attachControl(canvas, false) ; 
-
-	// let animation = new BABYLON.Animation("camera_animation", "position", 60, BABYLON.Animation.ANIMATIONTYPE_VECTOR3, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE)
-
-	// let keys = []
-	// keys.push({frame:0, value:new BABYLON.Vector3(0, 0, 0)})
-	// keys.push({frame:60, value:new BABYLON.Vector3(5, 0, 0)})
-
-	// animation.setKeys(keys)
-
-	// camera.animations.push(animation)
-
-	// scn.beginAnimation(camera, 0, 120, true)
 
 	return camera
 }
@@ -69,19 +54,6 @@ function creerSol(name,options,scn){
 	let sol = BABYLON.Mesh.CreateGround(name,larg,prof,2.0,scn) ;
 
 	sol.material = materiau ;
-	// sol.material.diffuseColor  = new BABYLON.Color3(1.0,0,0) ;
-	// sol.material.diffuseTexture = new BABYLON.Texture('./assets/textures/grass.png',scene);
-	// sol.material.specularTexture = new BABYLON.Texture('./assets/textures/grass.png',scene);
-	// sol.material.emissiveTexture = new BABYLON.Texture('./assets/textures/grass.png',scene);
-	// sol.material.ambientTexture = new BABYLON.Texture('./assets/textures/grass.png',scene);
-	// sol.material.diffuseTexture.uScale = 10.0;
-	// sol.material.diffuseTexture.vScale = 10.0;
-	// sol.material.specularTexture.uScale = 10.0;
-	// sol.material.specularTexture.vScale = 10.0;
-	// sol.material.emissiveTexture.uScale = 10.0;
-	// sol.material.emissiveTexture.vScale = 10.0;
-	// sol.material.ambientTexture.uScale = 10.0;
-	// sol.material.ambientTexture.vScale = 10.0;
 	sol.receiveShadows = true;
 	sol.metadata = {"type": 'ground'}
 
@@ -96,14 +68,15 @@ function creerMateriauSimple(nom,options,scn){
 	let vScale  = options.vScale  || 1.0 ; 
 
 	let materiau = new BABYLON.StandardMaterial(nom,scn) ; 
-	if(couleur != null) materiau.diffuseColor = couleur ;
+	if (couleur != null) materiau.diffuseColor = couleur;
+	
 
 	materiau.specularColor =  new BABYLON.Color3(.3,.3,.3)
 	
-	if(texture!= null){
-		materiau.diffuseTexture = new BABYLON.Texture(texture,scn) ; 
-		materiau.diffuseTexture.uScale = uScale ; 
-		materiau.diffuseTexture.vScale = vScale ; 
+	if(texture != null){
+		materiau.diffuseTexture = new BABYLON.Texture(texture,scn);
+		materiau.diffuseTexture.uScale = uScale; 
+		materiau.diffuseTexture.vScale = vScale;
 	}
 	return materiau ; 
 }
@@ -129,7 +102,9 @@ function creerPoster(nom,opts,scn){
 	let options = opts || {} ; 
 	let hauteur = options["hauteur"] || 1.0 ; 
 	let largeur = options["largeur"] || 1.0 ; 	
-	let textureName = options["tableau"] || ""; 
+	let textureName = options["tableau"] || "";
+	let subText = options["subText"] || null;
+	subText.material.alpha = 0;
 
 	var group = new BABYLON.TransformNode("group-"+nom)
 	var tableau1 = BABYLON.MeshBuilder.CreatePlane("tableau-" + nom, {width:largeur,height:hauteur}, scn);
@@ -139,12 +114,78 @@ function creerPoster(nom,opts,scn){
 	var mat = new BABYLON.StandardMaterial("tex-tableau-" + nom, scn);
 	let texture = new BABYLON.Texture(textureName, scn);
 	mat.diffuseTexture = texture;
-	console.log(texture.getSize());
 	tableau1.material = mat;
 
 	tableau1.receiveShadows = true;
 
+	tableau1.actionManager = new BABYLON.ActionManager(scn);
+
+	if (subText != null) {
+		tableau1.actionManager
+			.registerAction(
+				new BABYLON.SetValueAction({
+					trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
+					parameter: {
+						mesh: playerSight,
+						usePreciseIntersection: true
+					}
+				},
+					subText.material,
+					'alpha',
+					1
+				)
+		);
+		
+		tableau1.actionManager
+		.registerAction(
+			new BABYLON.SetValueAction({
+				trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, 
+				parameter: { 
+					mesh: playerSight,
+					usePreciseIntersection: true
+				}
+			}, 
+			subText.material,
+			'alpha',
+			0
+		)		
+	)
+	}
+
+
 	return group ;
+}
+
+function paintingText(nom, opts, scn) {
+	let options = opts || {};
+	let displayText = options["text"] || "---";
+	let planeWidth = options["planeWidth"] || 1;
+	let planeHeight = options["planeHeight"] || 1;
+	let plane = BABYLON.MeshBuilder.CreatePlane("plane-" + nom, { width: planeWidth, height: planeHeight }, scn);
+	
+	let DTWidth = planeWidth * 60;
+	let DTHeight = planeHeight * 60;
+    
+    var dynamicTexture = new BABYLON.DynamicTexture("DynamicTexture", {width:DTWidth, height:DTHeight}, scn);
+    var ctx = dynamicTexture.getContext();
+	var size = 12;
+    ctx.font = size + "px Arial";
+    var textWidth = ctx.measureText(displayText).width;
+
+    var ratio = textWidth/size;
+    var font_size = Math.min(Math.floor(DTWidth / (ratio * 1)), 12);
+    var font = "bold " + font_size + "px Arial"
+	
+	dynamicTexture.drawText(displayText, null, null, font, "white", "transparent", true);
+	
+    var mat = new BABYLON.StandardMaterial("mat", scene);
+	mat.diffuseTexture = dynamicTexture;
+	mat.diffuseTexture.hasAlpha = true;
+	
+    //apply material
+    plane.material = mat;
+
+    return plane;
 }
 
 function circlePosters(nom, opts, scn) {
@@ -155,11 +196,16 @@ function circlePosters(nom, opts, scn) {
 	let width = options["width"] || 1;
 	let startAngle = options["startAngle"] || 0;
 	let totalAngle = options["totalAngle"] || 2 * 3.14;
+	let distanceInGround = options["distanceInGround"] || 6;
 
 	let group = new BABYLON.TransformNode("group-" + nom);
 
-	let zone = options.zone || creerSphere("zone", { diametre: 6 }, scn)
+	let zone = options.zone || creerSphere("zone", { diametre: 10 }, scn)
 	zone.parent = group;
+
+	let paintingAnchor = new BABYLON.TransformNode("anchor-" + nom);
+	paintingAnchor.parent = group;
+	paintingAnchor.position.y -= distanceInGround;
 
 	for (let i = 0; i < collection.length; i++) {
 
@@ -167,13 +213,56 @@ function circlePosters(nom, opts, scn) {
 		l = width;
 		h = l * t.height / t.width
 
-		let tableau = creerPoster(t.name, { tableau: t.path, largeur:l, hauteur:h}, scn);
+		let subText = paintingText("sous_text-" + t.name, { planeWidth: l, text:t.description }, scn);
+		subText.position.z -= .1;
+
+		let tableau = creerPoster(t.name, { tableau: t.path, largeur: l, hauteur: h, subText:subText }, scn);
+
+		subText.parent = tableau;
+
 		tableau.position.x = Math.cos(startAngle + i * totalAngle / (collection.length-1)) * radius;
 		tableau.position.z = Math.sin(startAngle + i * totalAngle / (collection.length-1)) * radius;
 		tableau.lookAt(new BABYLON.Vector3(0, 0, 0));
 		tableau.rotation.y += 3.14;
-		tableau.parent = group;
+		tableau.parent = paintingAnchor;
+
+		tableau.receiveShadows = true;
+
+		tableau.actionManager = new BABYLON.ActionManager(scn);
+
+
 	}
+
+	zone.isVisible = false;
+	zone.actionManager = new BABYLON.ActionManager(scn)
+	zone.actionManager
+	.registerAction(
+		new BABYLON.InterpolateValueAction({
+			trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, 
+			parameter: { 
+				mesh: playerCol,
+			}
+		}, 
+		paintingAnchor,
+		'position.y',
+		paintingAnchor.position.y + distanceInGround,
+		500
+		)
+	)
+	zone.actionManager
+	.registerAction(
+		new BABYLON.InterpolateValueAction({
+			trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, 
+			parameter: { 
+				mesh: playerCol,
+			}
+		}, 
+		paintingAnchor,
+		'position.y',
+		paintingAnchor.position.y,
+		500	
+		)		
+	)
 
 	return group;
 }
@@ -185,7 +274,7 @@ function creerCloison(nom,opts,scn){
 	let epaisseur = options.epaisseur || 0.1 ;
 	let materiau   = options.materiau || new BABYLON.StandardMaterial("materiau-pos"+nom,scn); 
 
-    let groupe = new BABYLON.TransformNode("groupe-"+nom) ; 
+	let groupe = new BABYLON.TransformNode("groupe-"+nom) ; 
 
 	let cloison = BABYLON.MeshBuilder.CreateBox(nom,{width:largeur,height:hauteur,depth:epaisseur},scn) ;
 	cloison.material = materiau ; 
@@ -195,7 +284,7 @@ function creerCloison(nom,opts,scn){
 	cloison.checkCollisions = true
 	cloison.receiveShadows = true;
 
-    return groupe ;  
+	return groupe ;  
 }
 
 function creerLumiereProximite(nom, opts, scn)
@@ -446,62 +535,62 @@ function creerPorte(nom, opts, scn)
 	zone.actionManager
 	.registerAction(
 		new BABYLON.InterpolateValueAction({
-            trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, 
-            parameter: { 
-                mesh: playerCol,
-            }
-        }, 
-        door,
-        'position.x',
-        door.position.x + deplacement,
+			trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, 
+			parameter: { 
+				mesh: playerCol,
+			}
+		}, 
+		door,
+		'position.x',
+		door.position.x + deplacement,
 		750
 		)
 	)
 	zone.actionManager
 	.registerAction(
 		new BABYLON.InterpolateValueAction({
-            trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, 
-            parameter: { 
-                mesh: playerCol,
-            }
-        }, 
-        door,
-        'position.x',
-        door.position.x,
+			trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, 
+			parameter: { 
+				mesh: playerCol,
+			}
+		}, 
+		door,
+		'position.x',
+		door.position.x,
 		750	
 		)		
 	)
 	
-	door.actionManager = new BABYLON.ActionManager(scn);
+	// door.actionManager = new BABYLON.ActionManager(scn);
 
-	door.actionManager
-	.registerAction(
-		new BABYLON.SetValueAction({
-            trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, 
-            parameter: { 
-                mesh: playerSight,
-				usePreciseIntersection: true
-            }
-        }, 
-        door,
-        'material',
-		selectedGlassMat
-		)
-	)
-	door.actionManager
-	.registerAction(
-		new BABYLON.SetValueAction({
-            trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, 
-            parameter: { 
-                mesh: playerSight,
-				usePreciseIntersection: true
-            }
-        }, 
-        door,
-        'material',
-		glassMat
-		)		
-	)
+	// door.actionManager
+	// .registerAction(
+	// 	new BABYLON.SetValueAction({
+	// 		trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, 
+	// 		parameter: { 
+	// 			mesh: playerSight,
+	// 			usePreciseIntersection: true
+	// 		}
+	// 	}, 
+	// 	door,
+	// 	'material',
+	// 	selectedGlassMat
+	// 	)
+	// )
+	// door.actionManager
+	// .registerAction(
+	// 	new BABYLON.SetValueAction({
+	// 		trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, 
+	// 		parameter: { 
+	// 			mesh: playerSight,
+	// 			usePreciseIntersection: true
+	// 		}
+	// 	}, 
+	// 	door,
+	// 	'material',
+	// 	glassMat
+	// 	)		
+	// )
 
 	return groupe
 }
@@ -518,11 +607,6 @@ function set_FPS_mode(scene, canvas, camera){
 				canvas.requestPointerLock();
 			}
 		}
-
-		//continue with shooting requests or whatever :P
-		//evt === 0 (left mouse click)
-		//evt === 1 (mouse wheel click (not scrolling))
-		//evt === 2 (right mouse click)
 	};
 
 	// Event listener when the pointerlock is updated (or removed by pressing ESC for example).

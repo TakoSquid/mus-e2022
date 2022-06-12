@@ -1,2 +1,4 @@
 *.pdf
+*.log
 /doc
+assets/blender_export/furso.jpg

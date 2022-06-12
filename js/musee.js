@@ -1,10 +1,3 @@
-
-// TODO :
-// - gravité constante
-// - vélocité diagonale à gérer
-// - collision avec l'escalier
-// - tableau / statues
-
 var canvas, engine
 var scene, camera
 var playerCol, playerSight
@@ -30,7 +23,6 @@ function init(){
 
 	let debugMat = new BABYLON.StandardMaterial("debugMat",scene)
 	playerSight.material = debugMat
-	// debugMat.wireframe = true 
 
 	playerSight.parent = camera
 
@@ -94,11 +86,11 @@ function peuplerScene(){
 
 	var cloisonEst = creerCloison("cloisonEst", {hauteur:10, largeur:30, materiau:materiauCloison}, scene)
 	cloisonEst.position.x += 15
-	cloisonEst.rotation.y = 3.14/2
+	cloisonEst.rotation.y = Math.PI/2
 
 	var cloisonOuest = creerCloison("cloisonOuest", {hauteur:10, largeur:30, materiau:materiauCloison}, scene)
 	cloisonOuest.position.x -= 15
-	cloisonOuest.rotation.y = 3.14/2
+	cloisonOuest.rotation.y = Math.PI/2
 
 
 	// Cloison du milieu
@@ -160,15 +152,6 @@ function peuplerScene(){
 	bigWindow.scaling.x = 27;
 	bigWindow.scaling.y = 4;
 	bigWindow.scaling.z = .2;
-	// portes
-	// porteMilieux = BABYLON.MeshBuilder.CreateBox("porteMilieux", {height:4,width:3, depth:.01}, scene)
-	// porteMilieux.position.y += 2
-	// porteMilieux.checkCollisions = true
-	// BABYLON.Animation.CreateAndStartAnimation("openDoor", porteMilieux, "position.x", 30, 120, porteMilieux.position.x, porteMilieux.position.x+3, BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT);
-
-	// let middleDoor = new Door(scene, "middleDoor")
-	// let leftDoor = new Door(scene, "leftDoor", 10)
-	// let rightDoor = new Door(scene, "rightDoor", -10)
 
 	let middleDoor = creerPorte("middleDoor", {}, scene)
 
@@ -184,22 +167,22 @@ function peuplerScene(){
 	var cloisonGauche = creerCloison("cloisonGauche", {hauteur:5, largeur:15, materiau:materiauCloison}, scene)
 	cloisonGauche.position.z -= 7.5
 	cloisonGauche.position.x += 5
-	cloisonGauche.rotation.y = 3.14/2
+	cloisonGauche.rotation.y = Math.PI/2
 
 	var cloisonDroite = creerCloison("cloisonDroite", {hauteur:5, largeur:15, materiau:materiauCloison}, scene)
 	cloisonDroite.position.z -= 7.5
 	cloisonDroite.position.x -= 5
-	cloisonDroite.rotation.y = 3.14/2
+	cloisonDroite.rotation.y = Math.PI/2
 
 	var solMezzanine = creerCloison("solMezzanine", {largeur:30,hauteur:15, materiau:materiauSol}, scene)
 	solMezzanine.position.y += 5
 	solMezzanine.position.z -= 15
-	solMezzanine.rotation.x = 3.14/2
+	solMezzanine.rotation.x = Math.PI/2
 
 	var toit = creerCloison("toit", {largeur:30,hauteur:30, materiau:materiauSol}, scene)
 	toit.position.y += 10
 	toit.position.z -= 15
-	toit.rotation.x = 3.14/2
+	toit.rotation.x = Math.PI/2
 
 	var escalierGauche = creerEscalier("escalierGauche", {hauteur:5, largeur:3, profondeur:8, stepsCount:20, materiau:materiauBois}, scene)
 	escalierGauche.position.x += 15 - 1.5
@@ -222,7 +205,6 @@ function peuplerScene(){
 	proxyLight.position.z -= 7.5
 	proxyLight.position.x -= 10
 
-	// var light = new BABYLON.SpotLight("spotLight", new BABYLON.Vector3(0, 5, 5), new BABYLON.Vector3(0, -1, 0), Math.PI / 3, 2, scene);
 
 	// Tele orbs
 	var tele = creerTeleSphere("teleSphere", {}, scene)
@@ -234,33 +216,45 @@ function peuplerScene(){
 	tele2.position.y += 5 + 1.5
 	tele2.position.z -= 1
 
-	function painting(name, path, width, height) {
-		return {"name":name, "path":path, "width":width, "height":height}
+	function painting(name = "", path = "", width = 0, height = 0, description = "") {
+		return {"name":name, "path":path, "width":width, "height":height, "description": description}
 	}
 
 	let prefix = "assets/textures/paintings/";
 
 	let collec = [
-		painting("test1", prefix + "boo.png", 1920, 1080),
-		painting("test2", prefix + "heyna.png", 1440, 1080),
-		painting("test3", prefix + "paper.png", 1280, 960),
-		painting("test4", prefix + "raiden.png", 717, 920),
-		painting("test5", prefix + "seoska.png", 720, 720),
-		painting("test6", prefix + "stanrenartr.png", 1440, 1080),
-		painting("test7", prefix + "tako.png", 637, 479),
-		painting("test8", prefix + "toco.png", 1440, 1080),
+		painting("test1", prefix + "boo.png", 1920, 1080, "Decembre 2021"),
+		painting("test2", prefix + "heyna.png", 1440, 1080, "Janvier 2022"),
+		painting("test3", prefix + "paper.png", 1280, 960, "Février 2022"),
+		painting("test4", prefix + "raiden.png", 717, 920, "Mars 2022"),
+		painting("test5", prefix + "seoska.png", 720, 720, "Avril 2022"),
+		painting("test6", prefix + "stanrenartr.png", 1440, 1080, "Mai 2022"),
+		painting("test7", prefix + "tako.png", 637, 479, "Octobre 2021"),
+		painting("test8", prefix + "toco.png", 1440, 1080, "Novembre 2022"),
 	]
 
-	let circle1 = circlePosters("first circle", { collection: collec, radius: 4.75, width:3, startAngle:3.14/4.0, totalAngle:2.0*3.14 - 2.0*3.14/4.0}, scene);
+	let circle1 = circlePosters("first circle", { collection: collec, radius: 4.75, width:3, startAngle:Math.PI/4.0, totalAngle:2.0*Math.PI - 2.0*Math.PI/4.0}, scene);
 	circle1.position.z -= 7.5;
 	circle1.position.y += .5;
-	circle1.rotation.y -= 3.14 / 2;
+	circle1.rotation.y -= Math.PI / 2;
 
-	BABYLON.SceneLoader.Append(
-		"assets/blender/",
-		"untitled.babylon",
-		scene
-	);
+	// BABYLON.SceneLoader.Append("assets/blender_export/", "untitled.babylon", scene, function (raindenScene) {
+	// 	raindenScene.debugLayer.show();
+
+	// 	skull = raindenScene.skeletons[0];
+	// 	console.log(skull.bones[0]);
+
+	// 	skull.beginAnimation("hello", true);
+	// });
+
+	BABYLON.SceneLoader.ImportMesh("Body", "assets/blender_export/", "untitled.babylon", scene, function (newMeshes, particleSystems, skeletons) {
+		var dude = newMeshes[0];
+
+		dude.rotation.y = Math.PI - Math.PI * 1/8;
+		dude.position = new BABYLON.Vector3(2, .1, 1);
+
+		skeletons[0].beginAnimation("waving", true);
+	});
 }
 
 var isLocked = false ; 
