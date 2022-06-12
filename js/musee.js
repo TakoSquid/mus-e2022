@@ -220,17 +220,19 @@ function peuplerScene(){
 		return {"name":name, "path":path, "width":width, "height":height, "description": description}
 	}
 
-	let prefix = "assets/textures/paintings/";
+	let prefix = "assets/textures/paintings/sublimepoulpe/";
+
+	// Oui oui je sais, un xml et c'était plié, mais flemme
 
 	let collec = [
-		painting("test1", prefix + "boo.png", 1920, 1080, "Decembre 2021"),
-		painting("test2", prefix + "heyna.png", 1440, 1080, "Janvier 2022"),
-		painting("test3", prefix + "paper.png", 1280, 960, "Février 2022"),
-		painting("test4", prefix + "raiden.png", 717, 920, "Mars 2022"),
-		painting("test5", prefix + "seoska.png", 720, 720, "Avril 2022"),
-		painting("test6", prefix + "stanrenartr.png", 1440, 1080, "Mai 2022"),
-		painting("test7", prefix + "tako.png", 637, 479, "Octobre 2021"),
-		painting("test8", prefix + "toco.png", 1440, 1080, "Novembre 2022"),
+		painting("test1", prefix + "boo.png", 1920, 1080, "Cadeau pour un artiste" + " - " +"Decembre 2021"),
+		painting("test2", prefix + "heyna.png", 1440, 1080, "Commande d'un client" + " - " +"Janvier 2022"),
+		painting("test3", prefix + "paper.png", 1280, 960, "Commande d'un client" + " - " +"Février 2022"),
+		painting("test4", prefix + "raiden.png", 717, 920, "Commande d'un client" + " - " +"Mars 2022"),
+		painting("test5", prefix + "seoska.png", 720, 720, "Cadeau pour un artiste" + " - " +"Avril 2022"),
+		painting("test6", prefix + "stanrenartr.png", 1440, 1080, "Commande d'un client" + " - " + "Mai 2022"),
+		painting("test7", prefix + "tako.png", 637, 479, "Premier écran titre" + " -" + "Octobre 2021"),
+		painting("test8", prefix + "toco.png", 1440, 1080, "Commande d'un client" + " - " +"Novembre 2022"),
 	]
 
 	let circle1 = circlePosters("first circle", { collection: collec, radius: 4.75, width:3, startAngle:Math.PI/4.0, totalAngle:2.0*Math.PI - 2.0*Math.PI/4.0}, scene);
@@ -238,14 +240,24 @@ function peuplerScene(){
 	circle1.position.y += .5;
 	circle1.rotation.y -= Math.PI / 2;
 
-	// BABYLON.SceneLoader.Append("assets/blender_export/", "untitled.babylon", scene, function (raindenScene) {
-	// 	raindenScene.debugLayer.show();
+	prefix = "assets/textures/paintings/zetterstrand/";
 
-	// 	skull = raindenScene.skeletons[0];
-	// 	console.log(skull.bones[0]);
+	collec = [
+		painting("zetterstrand1", prefix + "Bathers.jpg", 1920, 1912, "Bathers. 20x20cm. Oil on canvas (2007)"),
+		painting("zetterstrand2", prefix + "wanderer.jpg", 1920, 1699, "Wanderer. 33x37cm. oil on canvas (2008)"),
+		painting("zetterstrand3", prefix + "moonlight-installation.jpg", 1920, 1912, "Moonlight installation. 64x64cm. Oil on canvas. (2009)"),
+		painting("zetterstrand4", prefix + "pwned-landscape.jpg", 1920, 1381, "Pwned Landscape. 250x180cm. Oil on canvas (2010)"),
+		painting("zetterstrand5", prefix + "the_box.jpg", 1918, 1920, "The Box. 99x99cm. Oil on canvas (2011)"),
+		painting("zetterstrand6", prefix + "hue_of_resolution.jpg", 1920, 1686, "Hue of resolution, 43x49cm, Oil on canvas (2012)"),
+		painting("zetterstrand7", prefix + "winter-ruins.jpg", 1920, 1502, "Winter Ruins. 157×200 cm. Oil on canvas (2013)"),
+		painting("zetterstrand8", prefix + "Early-Morning-Delft.jpg", 1697, 1920, "Early Morning, Delft. 49x43cm. Oil on canvas (2014)"),
+	]
 
-	// 	skull.beginAnimation("hello", true);
-	// });
+	let circle2 = circlePosters("first circle", { collection: collec, radius: 4.75, width:3, startAngle:Math.PI/4.0, totalAngle:2.0*Math.PI - 2.0*Math.PI/4.0}, scene);
+	circle2.position.x -= 10;
+	circle2.position.z -= 7.5;
+	circle2.position.y += .5;
+	circle2.rotation.y -= Math.PI / 2;
 
 	BABYLON.SceneLoader.ImportMesh("Body", "assets/blender_export/", "untitled.babylon", scene, function (newMeshes, particleSystems, skeletons) {
 		var dude = newMeshes[0];
@@ -255,27 +267,24 @@ function peuplerScene(){
 
 		skeletons[0].beginAnimation("waving", true);
 	});
+
+	//scene.debugLayer.show();
+
+	// var light = new BABYLON.SpotLight("spotLight", new BABYLON.Vector3(0, 1, 0), new BABYLON.Vector3(0, -1, 0), Math.PI / 3, 0, scene);
 }
 
 var isLocked = false ; 
 
 function set_FPS_mode(scene, canvas, camera){
 
-	// On click event, request pointer lock
 	scene.onPointerDown = function (evt) {
 
-		//true/false check if we're locked, faster than checking pointerlock on each single click.
 		if (!isLocked) {
 			canvas.requestPointerLock = canvas.requestPointerLock || canvas.msRequestPointerLock || canvas.mozRequestPointerLock || canvas.webkitRequestPointerLock || false;
 			if (canvas.requestPointerLock) {
 				canvas.requestPointerLock();
 			}
 		}
-
-		//continue with shooting requests or whatever :P
-		//evt === 0 (left mouse click)
-		//evt === 1 (mouse wheel click (not scrolling))
-		//evt === 2 (right mouse click)
 	};
 
 	// Event listener when the pointerlock is updated (or removed by pressing ESC for example).

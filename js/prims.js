@@ -116,6 +116,8 @@ function creerPoster(nom,opts,scn){
 	mat.diffuseTexture = texture;
 	tableau1.material = mat;
 
+	mat.specularColor = new BABYLON.Color3(0.5, .5, .5);
+
 	tableau1.receiveShadows = true;
 
 	tableau1.actionManager = new BABYLON.ActionManager(scn);
@@ -163,17 +165,17 @@ function paintingText(nom, opts, scn) {
 	let planeHeight = options["planeHeight"] || 1;
 	let plane = BABYLON.MeshBuilder.CreatePlane("plane-" + nom, { width: planeWidth, height: planeHeight }, scn);
 	
-	let DTWidth = planeWidth * 60;
-	let DTHeight = planeHeight * 60;
+	let DTWidth = planeWidth * 128;
+	let DTHeight = planeHeight * 128;
     
     var dynamicTexture = new BABYLON.DynamicTexture("DynamicTexture", {width:DTWidth, height:DTHeight}, scn);
     var ctx = dynamicTexture.getContext();
 	var size = 12;
     ctx.font = size + "px Arial";
-    var textWidth = ctx.measureText(displayText).width;
+	var textWidth = ctx.measureText(displayText).width;
 
     var ratio = textWidth/size;
-    var font_size = Math.min(Math.floor(DTWidth / (ratio * 1)), 12);
+    var font_size = Math.min(Math.floor(DTWidth / (ratio * 1)), 20);
     var font = "bold " + font_size + "px Arial"
 	
 	dynamicTexture.drawText(displayText, null, null, font, "white", "transparent", true);
@@ -181,6 +183,7 @@ function paintingText(nom, opts, scn) {
     var mat = new BABYLON.StandardMaterial("mat", scene);
 	mat.diffuseTexture = dynamicTexture;
 	mat.diffuseTexture.hasAlpha = true;
+
 	
     //apply material
     plane.material = mat;
@@ -213,7 +216,7 @@ function circlePosters(nom, opts, scn) {
 		l = width;
 		h = l * t.height / t.width
 
-		let subText = paintingText("sous_text-" + t.name, { planeWidth: l, text:t.description }, scn);
+		let subText = paintingText("sous_text-" + t.name, { planeWidth: l * 1.2, text:t.description }, scn);
 		subText.position.z -= .1;
 
 		let tableau = creerPoster(t.name, { tableau: t.path, largeur: l, hauteur: h, subText:subText }, scn);
@@ -229,8 +232,6 @@ function circlePosters(nom, opts, scn) {
 		tableau.receiveShadows = true;
 
 		tableau.actionManager = new BABYLON.ActionManager(scn);
-
-
 	}
 
 	zone.isVisible = false;
@@ -263,6 +264,17 @@ function circlePosters(nom, opts, scn) {
 		500	
 		)		
 	)
+
+	cone = BABYLON.MeshBuilder.CreateCylinder("cone-" + nom, { height: .1, diameter: radius*2 }, scn);
+	cone.position.y -= .4;
+
+	let glassMat = new BABYLON.StandardMaterial("transp", scn)
+	glassMat.alpha = 0.3
+	glassMat.diffuseColor = new BABYLON.Color3(230 / 255, 1, 252 / 255)
+	
+	cone.material = glassMat;
+
+	cone.parent = group;
 
 	return group;
 }
