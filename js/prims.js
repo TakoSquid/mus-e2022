@@ -121,8 +121,10 @@ function creerPoster(nom,opts,scn){
 	let largeur = options["largeur"] || 1.0 ; 	
 	let textureName = options["tableau"] || "";
 	let subText = options["subText"] || null;
-	subText.material.alpha = 0;
 
+	if (subText !=null)  {
+		subText.material.alpha = 0;
+	}
 	var group = new BABYLON.TransformNode("group-"+nom)
 	var tableau1 = BABYLON.MeshBuilder.CreatePlane("tableau-" + nom, {width:largeur,height:hauteur}, scn);
 	tableau1.parent = group ; 
@@ -130,7 +132,9 @@ function creerPoster(nom,opts,scn){
 
 	var mat = new BABYLON.StandardMaterial("tex-tableau-" + nom, scn);
 	let texture = new BABYLON.Texture(textureName, scn);
+	texture.hasAlpha = true;
 	mat.diffuseTexture = texture;
+	mat.hasAlpha = true;
 	tableau1.material = mat;
 
 	mat.specularColor = new BABYLON.Color3(0.5, .5, .5);
@@ -201,8 +205,6 @@ function paintingText(nom, opts, scn) {
 	mat.diffuseTexture = dynamicTexture;
 	mat.diffuseTexture.hasAlpha = true;
 
-	
-    //apply material
     plane.material = mat;
 
     return plane;

@@ -34,6 +34,8 @@ function init(){
 
 	playerSight.parent = camera
 
+	camera.position.z += 2
+
 	createLights()
 
 	creerSkyBox(scene)
@@ -276,6 +278,7 @@ function peuplerScene(){
 
 	tele.position.z += 10
 	tele.position.y += 1.5
+	tele.position.x += 5
 
 	var tele2 = creerTeleSphere("teleSphere", {}, scene)
 	tele2.position.y += 5 + 1.5
@@ -354,9 +357,38 @@ function peuplerScene(){
 	rembarde_droite.rotation.y = -Math.PI / 2;
 
 
+	let carpet1 = creerPoster("carpet1", {tableau:"assets/textures/carpet1.png", largeur:1024/500*3, hauteur:680/500*3},scene)
+	carpet1.rotation.x = Math.PI / 2;
+	carpet1.position.y += 0.1 + 5;
+	carpet1.position.z -= 11
+
+	let carpet2 = creerPoster("carpet2", {tableau:"assets/textures/carpet2.png", largeur:1024/500*5, hauteur:529/500*5},scene)
+	carpet2.rotation.x = Math.PI / 2;
+	carpet2.position.y += 0.1;
+	carpet2.position.z += 7.5
+	carpet2.rotation.y = Math.PI / 2;
+	carpet2.position.x -= (529 / 500 * 5) / 2;
+
+	let indication1 = paintingText("indication1", {text: "Salle SublimePoulpe", planeWidth: 20, planeHeight:20}, scene)
+	indication1.rotation.y = Math.PI;
+	indication1.position.y += 4.5;
+	indication1.position.z += .1
+
+	let indication2 = paintingText("indication2", {text: "Salle Niklas Mäckle", planeWidth: 20, planeHeight:20}, scene)
+	indication2.rotation.y = Math.PI;
+	indication2.position.y += 4.5;
+	indication2.position.z += .1
+	indication2.position.x += 10
+
+	let indication3 = paintingText("indication3", {text: "Salle Kristoffer Zetterstrand", planeWidth: 20, planeHeight:20}, scene)
+	indication3.rotation.y = Math.PI;
+	indication3.position.y += 4.5;
+	indication3.position.z += .1
+	indication3.position.x -= 10
+
 	// rembarde_gauche.position.y += 0;
 
-	//scene.debugLayer.show();
+	scene.debugLayer.show();
 
 	// var light = new BABYLON.SpotLight("spotLight", new BABYLON.Vector3(0, 1, 0), new BABYLON.Vector3(0, -1, 0), Math.PI / 3, 0, scene);
 }
