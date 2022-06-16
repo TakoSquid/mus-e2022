@@ -48,13 +48,50 @@ function init(){
 
 		skeletons[0].beginAnimation("waving", true);
 	});
+
+	
+	BABYLON.SceneLoader.LoadAssetContainer("assets/blender_export/doggy/", "doggy.obj", scene, function (container) {
+		
+		let doggy = container.meshes[0]
+
+		doggy.scaling= new BABYLON.Vector3(3, 3, 3);
+		doggy.position.y += 6.2;
+		doggy.position.z += -9;
+		doggy.rotation.y = Math.PI / 5;
+
+		const animWheel = new BABYLON.Animation("wheelAnimation", "rotation.y", 30, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+
+		const wheelKeys = []; 
+
+		//At the animation key 0, the value of rotation.y is 0
+		wheelKeys.push({
+			frame: 0,
+			value: 0
+		});
+
+		//At the animation key 30, (after 1 sec since animation fps = 30) the value of rotation.y is 2PI for a complete rotation
+		wheelKeys.push({
+			frame: 180,
+			value: 2 * Math.PI
+		});
+		
+		animWheel.setKeys(wheelKeys);
+
+		doggy.animations = [];
+		doggy.animations.push(animWheel);
+
+		// //Begin animation - object to animate, first frame, last frame and loop if true
+		scene.beginAnimation(doggy, 0, 180, true);
+
+    	container.addAllToScene();
+	})
 	
 	var music = new BABYLON.Sound("Music", "assets/sounds/clic.wav", scene, null, {
 		loop: false,
 		autoplay: false
 	});
 
-	scene.debugLayer.show();
+	// scene.debugLayer.show();
 
 	set_FPS_mode(scene, canvas,camera) ; 
 
