@@ -5,15 +5,22 @@ let doors;
 var selectedTeleportationSphere;
 var startPosition, endPosition
 var teleportationProgress = 1.0
+var kids;
 
 function init(){
 	canvas = document.getElementById("renderCanvas") ; 
 	engine = new BABYLON.Engine(canvas,true) 
-	scene  = creerScene() 
-	camera = creerCamera("camera",{}, scene) 
+	scene = creerScene() 
+	camera = creerCamera("camera", {}, scene)
 
 	playerCol = BABYLON.MeshBuilder.CreateSphere("playerCol",{diameter:1} , scene);
 	playerCol.isPickable = false
+
+	kids = new BABYLON.Sound("music", "assets/sounds/kids.mp3", scene, null, {
+		loop: false,
+		autoplay: false,
+		volume: 0.1
+	});
 
 	playerCol.parent = camera
 
@@ -33,6 +40,22 @@ function init(){
 
 	peuplerScene()
 
+	BABYLON.SceneLoader.ImportMesh("Body", "assets/blender_export/", "untitled.babylon", scene, function (newMeshes, particleSystems, skeletons) {
+		var dude = newMeshes[0];
+
+		dude.rotation.y = Math.PI - Math.PI * 1/8;
+		dude.position = new BABYLON.Vector3(2, .1, 1);
+
+		skeletons[0].beginAnimation("waving", true);
+	});
+	
+	var music = new BABYLON.Sound("Music", "assets/sounds/clic.wav", scene, null, {
+		loop: false,
+		autoplay: false
+	});
+
+	scene.debugLayer.show();
+
 	set_FPS_mode(scene, canvas,camera) ; 
 
 	window.addEventListener("resize", function(){engine.resize();}) ; 
@@ -43,6 +66,10 @@ function init(){
 			teleportationProgress += 0.02
 
 			camera.position = BABYLON.Vector3.Lerp(startPosition, endPosition, smoothStep(teleportationProgress))
+
+			if (teleportationProgress >= 1.0) {
+				kids.play();
+			}
 		}
 
 		scene.render();
@@ -254,7 +281,7 @@ function peuplerScene(){
 		painting("zetterstrand8", prefix + "Early-Morning-Delft.jpg", 1697, 1920, "Early Morning, Delft. 49x43cm. Oil on canvas (2014)"),
 	]
 
-	let circle2 = circlePosters("first circle", { collection: collec, radius: 4.75, width:3, startAngle:Math.PI/4.0, totalAngle:2.0*Math.PI - 2.0*Math.PI/4.0}, scene);
+	let circle2 = circlePosters("second circle", { collection: collec, radius: 4.75, width:3, startAngle:Math.PI/4.0, totalAngle:2.0*Math.PI - 2.0*Math.PI/4.0}, scene);
 	circle2.position.x -= 10;
 	circle2.position.z -= 7.5;
 	circle2.position.y += .5;
@@ -273,7 +300,7 @@ function peuplerScene(){
 		painting("mackle8", prefix + "Winter's First Snow.jpg", 1920, 835, "Winter's First Snow - Niklas Mäckle"),
 	]
 
-	let circle3 = circlePosters("first circle", { collection: collec, radius: 4.75, width:3, startAngle:Math.PI/4.0, totalAngle:2.0*Math.PI - 2.0*Math.PI/4.0}, scene);
+	let circle3 = circlePosters("third circle", { collection: collec, radius: 4.75, width:3, startAngle:Math.PI/4.0, totalAngle:2.0*Math.PI - 2.0*Math.PI/4.0}, scene);
 	circle3.position.x += 10;
 	circle3.position.z -= 7.5;
 	circle3.position.y += .5;
@@ -288,16 +315,6 @@ function peuplerScene(){
 	rembarde_droite.position.x -= 2
 	rembarde_droite.position.y += 5
 	rembarde_droite.rotation.y = -Math.PI / 2;
-
-	BABYLON.SceneLoader.ImportMesh("Body", "assets/blender_export/", "untitled.babylon", scene, function (newMeshes, particleSystems, skeletons) {
-		var dude = newMeshes[0];
-
-		dude.rotation.y = Math.PI - Math.PI * 1/8;
-		dude.position = new BABYLON.Vector3(2, .1, 1);
-
-		skeletons[0].beginAnimation("waving", true);
-	});
-
 
 
 	// rembarde_gauche.position.y += 0;
@@ -357,6 +374,7 @@ window.addEventListener ("keydown", function(event){
 window.addEventListener ("click", function(){
 	if(selectedTeleportationSphere != null && teleportationProgress >= 1.0) {
 
+		get_clic().play();
 		teleportationProgress = 0.0
 		startPosition = camera.position
 		endPosition = selectedTeleportationSphere

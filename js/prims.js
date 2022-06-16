@@ -1,10 +1,27 @@
+var clic, clac;
 
-
-function creerScene(){
+function creerScene() {
 	var scn = new BABYLON.Scene(engine) ;
-	scn.gravity = new BABYLON.Vector3(0,-.02,0)
-	scn.collisionsEnabled = true ; 
-	return scn ;
+	scn.gravity = new BABYLON.Vector3(0, -.02, 0)
+	scn.collisionsEnabled = true;
+
+	
+	clic = new BABYLON.Sound("music", "assets/sounds/clic.wav", scn, null, {
+		loop: false,
+		autoplay: false,
+		volume:.5
+	});
+	
+	clac = new BABYLON.Sound("music", "assets/sounds/clac.wav", scn, null, {
+		loop: false,
+		autoplay: false,
+		volume:0.5
+	});
+	return scn;
+}
+
+function get_clic() {
+	return clic;
 }
 
 
@@ -203,12 +220,13 @@ function circlePosters(nom, opts, scn) {
 
 	let group = new BABYLON.TransformNode("group-" + nom);
 
-	let zone = options.zone || creerSphere("zone", { diametre: 10 }, scn)
+	let zone = options.zone || creerSphere("zone" + nom, { diametre: 10 }, scn)
 	zone.parent = group;
 
 	let paintingAnchor = new BABYLON.TransformNode("anchor-" + nom);
 	paintingAnchor.parent = group;
 	paintingAnchor.position.y -= distanceInGround;
+
 
 	for (let i = 0; i < collection.length; i++) {
 
@@ -236,34 +254,55 @@ function circlePosters(nom, opts, scn) {
 
 	zone.isVisible = false;
 	zone.actionManager = new BABYLON.ActionManager(scn)
-	zone.actionManager
-	.registerAction(
-		new BABYLON.InterpolateValueAction({
-			trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger, 
-			parameter: { 
-				mesh: playerCol,
-			}
-		}, 
-		paintingAnchor,
-		'position.y',
-		paintingAnchor.position.y + distanceInGround,
-		500
+
+
+	zone.actionManager.registerAction(
+		new BABYLON.CombineAction(
+			{
+				trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
+				parameter: {
+					mesh: playerCol,
+				}
+			},
+			[
+				new BABYLON.InterpolateValueAction(
+					BABYLON.ActionManager.NothingTrigger,
+					paintingAnchor,
+					'position.y',
+					paintingAnchor.position.y + distanceInGround,
+					500
+				),
+					new BABYLON.PlaySoundAction(
+					BABYLON.ActionManager.NothingTrigger,
+					clic
+				)
+			]
 		)
-	)
-	zone.actionManager
-	.registerAction(
-		new BABYLON.InterpolateValueAction({
-			trigger: BABYLON.ActionManager.OnIntersectionExitTrigger, 
-			parameter: { 
-				mesh: playerCol,
-			}
-		}, 
-		paintingAnchor,
-		'position.y',
-		paintingAnchor.position.y,
-		500	
-		)		
-	)
+	);
+
+	zone.actionManager.registerAction(
+		new BABYLON.CombineAction(
+			{
+				trigger: BABYLON.ActionManager.OnIntersectionExitTrigger,
+				parameter: {
+					mesh: playerCol,
+				}
+			},
+			[
+				new BABYLON.InterpolateValueAction(
+					BABYLON.ActionManager.NothingTrigger,
+					paintingAnchor,
+					'position.y',
+					paintingAnchor.position.y,
+					500
+				),
+					new BABYLON.PlaySoundAction(
+					BABYLON.ActionManager.NothingTrigger,
+					clac
+				)
+			]
+		)
+	);
 
 	cone = BABYLON.MeshBuilder.CreateCylinder("cone-" + nom, { height: .1, diameter: radius*2 }, scn);
 	cone.position.y -= .4;
@@ -309,7 +348,7 @@ function creerLumiereProximite(nom, opts, scn)
 	light.diffuse = diffuse
 	light.intensity = 0.0;
 	light.parent = groupe
-	let zone = options.zone || creerSphere("zone", {diametre:10}, scn)
+	let zone = options.zone || creerSphere("zone" + nom, {diametre:10}, scn)
 
 	let fakeLamp = creerSphere("fake_lamp", {diametre:.5}, scn)
 
@@ -585,7 +624,7 @@ function creerPorte(nom, opts, scn)
 	door.isPickable = true
 	door.receiveShadows = true;
 
-	let zone = options.zone || creerSphere("zone", {diametre:6}, scn)
+	let zone = options.zone || creerSphere("zone" + nom, {diametre:6}, scn)
 	zone.position.y += 2
 
 	zone.parent = groupe
