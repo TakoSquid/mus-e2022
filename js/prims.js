@@ -398,14 +398,14 @@ function creerEscalier(nom, opts, scn)
 	let stepsCount = options.stepsCount || 10;
 	let materiau = options.materiau || new BABYLON.StandardMaterial("materiau-pos"+nom,scn);
 	let profondeur = options.profondeur || 1.0
-	let stepDepth = options.stepDepth || .3
+	let stepDepth = options.stepDepth || .6
 
 	let groupe = new BABYLON.TransformNode("groupe-"+nom);
 
 	let stepHeight = hauteur/stepsCount
 
 	for (let i = 0; i < stepsCount; i++) {
-		let step = BABYLON.MeshBuilder.CreateBox(nom, {width:largeur, height: stepHeight/2.0, dept:stepDepth},scn)
+		let step = BABYLON.MeshBuilder.CreateBox("step-" + nom + "-" + i, {width:largeur, height: stepHeight/2.0, depth:stepDepth},scn)
 		step.position.y += stepHeight*i + stepHeight/2
 		step.position.z -= (profondeur/stepsCount)*i // Taille giron
 		step.material = materiau;
@@ -416,6 +416,54 @@ function creerEscalier(nom, opts, scn)
 	} 
 
 	return groupe
+}
+
+function creerRembarde(nom, opts, scn) 
+{
+	let options = opts || {};
+	let hauteur = options.hauteur || 1.0;
+	let longueur = options.longueur || 10;
+	let divisionCount = options.divisinoCount || 4;
+	let materiau = options.materiau || new BABYLON.StandardMaterial("materiau-pos" + nom, scn);
+	
+	let glassMat = new BABYLON.StandardMaterial("transp", scn)
+	glassMat.alpha = 0.7
+	glassMat.diffuseColor = new BABYLON.Color3(230/255, 1, 252/255)
+
+	let groupe = new BABYLON.TransformNode("groupe-" + nom);
+
+	let dist = longueur / divisionCount;
+
+	let barriere_ratio = 0.9;
+
+	let l = longueur + .1;
+	let partie_haute = BABYLON.MeshBuilder.CreateBox("partie_haute" + nom, { width: .2, height: (1.0 - barriere_ratio) * hauteur, depth: l })
+	partie_haute.position.y += barriere_ratio * hauteur + (1.0 - barriere_ratio) * hauteur * .5;
+	partie_haute.position.z = longueur / 2;
+
+	let vitre = BABYLON.MeshBuilder.CreateBox("vitre-" + nom, { width: 0.05, height: barriere_ratio * hauteur, depth: longueur })
+	vitre.position.y += barriere_ratio * hauteur * 0.5
+	vitre.position.z += longueur / 2;
+	vitre.material = glassMat;
+	vitre.parent = groupe;
+
+	partie_haute.checkCollisions = true;
+	partie_haute.receiveShadows = true;
+	partie_haute.material = materiau;
+	partie_haute.parent = groupe;
+
+	for (let i = 0; i < divisionCount + 1; i++) {
+		let column = BABYLON.MeshBuilder.CreateBox("pilier-" + nom + "-" + i, { width: .1, height: barriere_ratio * hauteur, depth: .1 })
+		column.position.z += dist * i;
+		column.position.y += barriere_ratio * hauteur * 0.5
+
+		column.checkCollisions = true
+		column.receiveShadows = true
+		column.material = materiau;
+		column.parent = groupe;
+	}
+
+	return groupe;
 }
 
 function creerTeleSphere(nom, opts, scn)

@@ -18,7 +18,8 @@ function init(){
 	playerCol.parent = camera
 
 	// Kind of raycast
-	playerSight = BABYLON.MeshBuilder.CreateBox("box", {width: .01	, height: .01, depth: 100 }, scene);
+	playerSight = BABYLON.MeshBuilder.CreateBox("box", { width: .01, height: .01, depth: 100 }, scene);
+
 	playerSight.position.z += 50 + 1.1
 
 	let debugMat = new BABYLON.StandardMaterial("debugMat",scene)
@@ -63,7 +64,7 @@ function peuplerScene(){
 	var materiauRouge = creerMateriauSimple("rouge",{couleur:new BABYLON.Color3(0.8,0.1,0.1)},scene) ;
 	var materiauCloison = creerMateriauSimple("mat-cloison",{texture:"assets/textures/wall.png", uScale:2}, scene) ; 
 	var materiauSol = creerMateriauSimple("mat-sol", {texture:"assets/textures/floor.png", uScale:2, vScale:2}, scene);
-	var materiauGrass = creerMateriauSimple("mat-grass", {texture:"assets/textures/grass.png", uScale:15, vScale:15}, scene);
+	var materiauGrass = creerMateriauSimple("mat-grass", {texture:"assets/textures/grass.jpg", uScale:15, vScale:15}, scene);
 	var materiauBois = creerMateriauSimple("mat-wood", { texture: "assets/textures/stairs.jpg", uScale: 2.0 / 7.0, vScale: 1 }, scene);
 	
 	let glassMat = new BABYLON.StandardMaterial("transp", scene)
@@ -259,6 +260,35 @@ function peuplerScene(){
 	circle2.position.y += .5;
 	circle2.rotation.y -= Math.PI / 2;
 
+	prefix = "assets/textures/paintings/mackle/";
+
+	collec = [
+		painting("mackle1", prefix + "Cherry.jpg", 1920, 1080, "Cherry - Niklas Mäckle"),
+		painting("mackle2", prefix + "Dissonance.jpg", 1920, 960, "Dissonance - Niklas Mäckle"),
+		painting("mackle3", prefix + "Neuschwanstein Castle.jpg", 1920, 835, "Neuschwanstein Castle.jpg - Niklas Mäckle"),
+		painting("mackle4", prefix + "North Bridge - Edinburgh.jpg", 1920, 1080, "North Bridge - Edinburgh - Niklas Mäckle"),
+		painting("mackle5", prefix + "untitled fortress thing.jpg", 1920, 835, "untitled fortress thing - Niklas Mäckle"),
+		painting("mackle6", prefix + "untitled.jpg", 1920, 1080, "untitled - Niklas Mäckle"),
+		painting("mackle7", prefix + "Visions of a Future World - Part 1.jpg", 1200, 1800, "Visions of a Future World - Part 1 - Niklas Mäckle"),
+		painting("mackle8", prefix + "Winter's First Snow.jpg", 1920, 835, "Winter's First Snow - Niklas Mäckle"),
+	]
+
+	let circle3 = circlePosters("first circle", { collection: collec, radius: 4.75, width:3, startAngle:Math.PI/4.0, totalAngle:2.0*Math.PI - 2.0*Math.PI/4.0}, scene);
+	circle3.position.x += 10;
+	circle3.position.z -= 7.5;
+	circle3.position.y += .5;
+	circle3.rotation.y -= Math.PI / 2;
+
+	let rembarde_gauche = creerRembarde("rembarde gauche", {materiau:materiauBois}, scene);
+	rembarde_gauche.position.x += 2
+	rembarde_gauche.position.y += 5
+	rembarde_gauche.rotation.y = Math.PI / 2;
+
+	let rembarde_droite = creerRembarde("rembarde gauche", {materiau:materiauBois}, scene);
+	rembarde_droite.position.x -= 2
+	rembarde_droite.position.y += 5
+	rembarde_droite.rotation.y = -Math.PI / 2;
+
 	BABYLON.SceneLoader.ImportMesh("Body", "assets/blender_export/", "untitled.babylon", scene, function (newMeshes, particleSystems, skeletons) {
 		var dude = newMeshes[0];
 
@@ -267,6 +297,10 @@ function peuplerScene(){
 
 		skeletons[0].beginAnimation("waving", true);
 	});
+
+
+
+	// rembarde_gauche.position.y += 0;
 
 	//scene.debugLayer.show();
 
