@@ -1,4 +1,5 @@
 *.pdf
+!Rapport Musée - Hernio.pdf
 *.log
 *.psd
 /doc
