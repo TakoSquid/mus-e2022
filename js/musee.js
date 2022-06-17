@@ -386,9 +386,18 @@ function peuplerScene(){
 	indication3.position.z += .1
 	indication3.position.x -= 10
 
+	let indication4 = paintingText("indication4", {text: "Colima Dog, circa 100 - 300 CE", planeWidth: 20, planeHeight:20}, scene)
+	indication4.rotation.y = Math.PI;
+	indication4.position.y += 8.5;
+	indication4.position.z -= 9
+
+	let indication5 = paintingText("indication5", {text: "Colima Dog, circa 100 - 300 CE", planeWidth: 20, planeHeight:20}, scene)
+	indication5.position.y += 8.5;
+	indication5.position.z -= 9
+
 	// rembarde_gauche.position.y += 0;
 
-	scene.debugLayer.show();
+	//scene.debugLayer.show();
 
 	// var light = new BABYLON.SpotLight("spotLight", new BABYLON.Vector3(0, 1, 0), new BABYLON.Vector3(0, -1, 0), Math.PI / 3, 0, scene);
 }
